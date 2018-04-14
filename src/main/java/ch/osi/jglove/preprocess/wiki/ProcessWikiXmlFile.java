@@ -1,4 +1,4 @@
-package ch.osi.jglove.preprocess;
+package ch.osi.jglove.preprocess.wiki;
 
 import java.io.File;
 import java.io.FileInputStream;

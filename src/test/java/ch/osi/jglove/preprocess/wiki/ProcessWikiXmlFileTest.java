@@ -1,4 +1,4 @@
-package ch.osi.jglove.preprocess;
+package ch.osi.jglove.preprocess.wiki;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -10,6 +10,9 @@ import java.util.stream.Stream;
 
 import org.junit.Ignore;
 import org.junit.Test;
+
+import ch.osi.jglove.preprocess.wiki.ProcessWikiXmlFile;
+import ch.osi.jglove.preprocess.wiki.WikiPage;
 
 public class ProcessWikiXmlFileTest {
 
