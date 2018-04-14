@@ -1,30 +1,27 @@
 package ch.osi.jglove.preprocess.wiki;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
-import ch.osi.jglove.preprocess.wiki.ProcessWikiXmlFile;
-import ch.osi.jglove.preprocess.wiki.WikiPage;
+import io.reactivex.Flowable;
+import io.reactivex.subscribers.TestSubscriber;
 
 public class ProcessWikiXmlFileTest {
 
 	@Test
 	public void processDeWiki37Articles() {
 		File file = getFile("dewiki-37-articles.xml");
-		ProcessWikiXmlFile processor = new ProcessWikiXmlFile();
+		TestSubscriber<WikiPage> testSubscriber = Flowable.fromIterable(new ProcessWikiXmlFile(file)).test();
 
-		Stream<WikiPage> output = processor.process(file);
-		assertThat(output).isNotNull();
-		List<WikiPage> pages = output.collect(Collectors.toList());
-
+		List<WikiPage> pages = testSubscriber.awaitDone(10, TimeUnit.SECONDS).values();
 		assertThat(pages).size().isEqualTo(36);
 		WikiPage first = pages.get(0);
 		assertThat(first.getTitle()).isEqualTo("Alan Smithee");
@@ -35,32 +32,25 @@ public class ProcessWikiXmlFileTest {
 	@Test
 	public void processNoTextArticle() {
 		File file = getFile("dewiki-no-text-article.xml");
-		ProcessWikiXmlFile processor = new ProcessWikiXmlFile();
+		TestSubscriber<WikiPage> testSubscriber = Flowable.fromIterable(new ProcessWikiXmlFile(file)).test();
 
-		Stream<WikiPage> output = processor.process(file);
-		assertThat(output).isNotNull();
-		List<WikiPage> pages = output.collect(Collectors.toList());
-
+		List<WikiPage> pages = testSubscriber.awaitDone(10, TimeUnit.SECONDS).values();
 		assertThat(pages).isEmpty();
 	}
 
 	@Test
 	@Ignore
-	public void procesFullWiki() {
+	public void procesFullWiki() throws Exception {
+		System.setProperty("jdk.xml.totalEntitySizeLimit", "" + 0);
 		File file = Paths.get("F:", "wiki", "dewiki-20180401-pages-articles.xml", "dewiki-20180401-pages-articles.xml")
 				.toFile();
-		ProcessWikiXmlFile processor = new ProcessWikiXmlFile();
+		Long count = Flowable.fromIterable(new ProcessWikiXmlFile(file)).count().toFuture().get(10, TimeUnit.MINUTES);
 
-		Stream<WikiPage> output = processor.process(file);
-		assertThat(output).isNotNull();
-		List<WikiPage> pages = output.collect(Collectors.toList());
-
-		assertThat(pages.size()).isGreaterThan(10000);
-		WikiPage first = pages.get(0);
-		assertThat(first.getTitle()).isEqualTo("Alan Smithee");
+		assertThat(count).isCloseTo(4227932L, within(100L));
 	}
 
 	private File getFile(String filename) {
-		return Paths.get("src", "test", "resources", "ch", "osi", "jglove", "preprocess", filename).toFile();
+		return Paths.get("src", "test", "resources", "ch", "osi", "jglove", "preprocess", "wiki", filename).toFile();
 	}
+
 }
