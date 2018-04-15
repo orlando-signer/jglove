@@ -15,14 +15,16 @@ plugins {
 dependencies {
     // This dependency is exported to consumers, that is to say found on their compile classpath.
     compile "io.reactivex.rxjava2:rxjava:2.1.12"
+    compile "edu.stanford.nlp:stanford-parser:3.9.1"
+
 
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    implementation 'com.google.guava:guava:23.0'
-	implementation 'org.slf4j:slf4j-simple:1.7.25'
+    implementation "com.google.guava:guava:23.0"
+	implementation "org.slf4j:slf4j-simple:1.7.25"
 
     // Use JUnit test framework
-    testImplementation 'junit:junit:4.12'
-    testCompile 'org.assertj:assertj-core:3.9.0'
+    testImplementation "junit:junit:4.12"
+    testCompile "org.assertj:assertj-core:3.9.0"
     
 }
 
